@@ -17,6 +17,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(robotino_interfaces REQUIRED)
 find_package(Boost 1.71.0 REQUIRED)
@@ -57,7 +58,7 @@ target_include_directories(robotino2_node PUBLIC
                            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-ament_target_dependencies(robotino2_node rclcpp geometry_msgs std_msgs robotino_interfaces)
+ament_target_dependencies(robotino2_node rclcpp std_msgs std_srvs geometry_msgs robotino_interfaces)
 
 
 

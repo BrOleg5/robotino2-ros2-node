@@ -8,6 +8,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/bool.hpp"
+#include "std_srvs/srv/empty.hpp"
 #include "robotino_interfaces/msg/distance_sensor_voltages.hpp"
 #include "robotino_interfaces/msg/motor_currents.hpp"
 #include "robotino_interfaces/msg/motor_positions.hpp"
@@ -17,7 +18,6 @@
 #include "robotino2/Robotino2.hpp"
 
 using namespace std::chrono;
-using std::placeholders::_1;
 
 class Robotino2Node : public rclcpp::Node {
     public:
@@ -33,15 +33,19 @@ class Robotino2Node : public rclcpp::Node {
 
             std::string node_name = this->get_name();
             cmd_vel_subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(node_name + "/cmd_vel", 10, 
-                                    std::bind(&Robotino2Node::cmd_vel_callback, this, _1));
+                                    std::bind(&Robotino2Node::cmd_vel_callback, this, std::placeholders::_1));
             mot_vel_subscription_ = this->create_subscription<robotino_interfaces::msg::MotorVelocities>(node_name + "/cmd_mot_vel", 10,
-                                    std::bind(&Robotino2Node::mot_vel_callback, this, _1));
+                                    std::bind(&Robotino2Node::mot_vel_callback, this, std::placeholders::_1));
 
             bumper_publisher_ = this->create_publisher<std_msgs::msg::Bool>(node_name + "/bumper", 10);
             motor_positions_publisher_ = this->create_publisher<robotino_interfaces::msg::MotorPositions>(node_name + "/mot_pos", 10);
             motor_velocities_publisher_ = this->create_publisher<robotino_interfaces::msg::MotorVelocities>(node_name + "/mot_vel", 10);
             motor_currents_publisher_ = this->create_publisher<robotino_interfaces::msg::MotorCurrents>(node_name + "/mot_cur", 10);
             distance_sensor_publisher_ = this->create_publisher<robotino_interfaces::msg::DistanceSensorVoltages>(node_name + "/dist_sens", 10);
+
+            reset_motor_positions_service_ = this->create_service<std_srvs::srv::Empty>(node_name + "/reset_pos", 
+                                             std::bind(&Robotino2Node::reset_motor_positions_callback, this, 
+                                             std::placeholders::_1, std::placeholders::_2));
 
             milliseconds sample_time = milliseconds(this->get_parameter("sample_time").get_parameter_value().get<long long>());
             timer_ = this->create_wall_timer(sample_time, std::bind(&Robotino2Node::timer_callback, this));
@@ -52,6 +56,8 @@ class Robotino2Node : public rclcpp::Node {
         void mot_vel_callback(const robotino_interfaces::msg::MotorVelocities& msg);
         void publish_all();
         void timer_callback();
+        void reset_motor_positions_callback(const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+                                            const std::shared_ptr<std_srvs::srv::Empty::Response> response);
 
         Robotino2 robotino;
 
@@ -67,6 +73,8 @@ class Robotino2Node : public rclcpp::Node {
 
         const milliseconds input_message_timeout;
         steady_clock::time_point last_input_message_time;
+
+        rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reset_motor_positions_service_;
 };
 
 #endif

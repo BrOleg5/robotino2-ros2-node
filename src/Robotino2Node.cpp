@@ -2,13 +2,13 @@
 
 void Robotino2Node::cmd_vel_callback(const geometry_msgs::msg::Twist& msg) {
     robotino.input.setRobotSpeed(static_cast<float>(msg.linear.x), static_cast<float>(msg.linear.y), static_cast<float>(msg.angular.z));
-    RCLCPP_INFO(this->get_logger(), "Receive set speed: %f, %f, %f", msg.linear.x, msg.linear.y, msg.angular.z);
+    // RCLCPP_INFO(this->get_logger(), "Receive set speed: %f, %f, %f", msg.linear.x, msg.linear.y, msg.angular.z);
     last_input_message_time = steady_clock::now();
 }
 
 void Robotino2Node::mot_vel_callback(const robotino_interfaces::msg::MotorVelocities& msg) {
     robotino.input.setMotorVelocities(msg.vel[0], msg.vel[1], msg.vel[2]);
-    RCLCPP_INFO(this->get_logger(), "Receive set motor velocities: %f, %f, %f", msg.vel[0], msg.vel[1], msg.vel[2]);
+    // RCLCPP_INFO(this->get_logger(), "Receive set motor velocities: %f, %f, %f", msg.vel[0], msg.vel[1], msg.vel[2]);
     last_input_message_time = steady_clock::now();
 }
 
@@ -41,4 +41,11 @@ void Robotino2Node::timer_callback() {
     }
     robotino.communicate_once();
     this->publish_all();
+    robotino.input.setMotorPositions();
+}
+
+void Robotino2Node::reset_motor_positions_callback(const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+                                                   const std::shared_ptr<std_srvs::srv::Empty::Response> response) {
+    robotino.input.resetMotorPositions();
+    RCLCPP_INFO(this->get_logger(), "Motor positions reset.");
 }

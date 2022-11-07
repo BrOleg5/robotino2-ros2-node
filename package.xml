@@ -9,6 +9,7 @@
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
   <depend>geometry_msgs</depend>
   <depend>robotino_interfaces</depend>
   <depend>boost</depend>
