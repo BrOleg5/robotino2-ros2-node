@@ -22,9 +22,15 @@ using namespace std::chrono;
 class Robotino2Node : public rclcpp::Node {
     public:
         Robotino2Node() : Node("robotino2"), input_message_timeout(200) {
-            this->declare_parameter("ip", "172.26.1.0");
-            this->declare_parameter("port", 80);
-            this->declare_parameter("sample_period", 20);
+            rcl_interfaces::msg::ParameterDescriptor ip_param_desc{};
+            ip_param_desc.description = "IP-address of Festo Robotino 2. Eg.: 172.26.1.0";
+            this->declare_parameter("ip", "172.26.1.0", ip_param_desc);
+            rcl_interfaces::msg::ParameterDescriptor port_param_desc{};
+            port_param_desc.description = "Festo Robotino 2 communication port. Default value: 80.";
+            this->declare_parameter("port", 80, port_param_desc);
+            rcl_interfaces::msg::ParameterDescriptor sample_period_param_desc{};
+            sample_period_param_desc.description = "Sample period for send and receive Robotino control and sensors data. Sample period in ms.";
+            this->declare_parameter("sample_period", 20, sample_period_param_desc);
 
             std::string address = this->get_parameter("ip").get_parameter_value().get<std::string>();
             int port = static_cast<int>(this->get_parameter("port").get_parameter_value().get<long long>());
