@@ -15,14 +15,8 @@ using namespace std::chrono_literals;
 
 class Robotino2 {
     public:
-        Robotino2(): input(), output(), socket(ios) {
-            transmitTCPPointer = reinterpret_cast<unsigned char*>(&transmitTCPPayload);
-            startMessage = buffer + startPayload;
-        }
-
-        ~Robotino2() {
-            socket.close();
-        }
+        Robotino2();
+        ~Robotino2();
 
         bool connect(const std::string& address, int port);
         bool connect(const char* address, int port);

@@ -10,9 +10,7 @@
 
 class Robotino2Input {
 public:
-    Robotino2Input() : robotinoKinematics(0.04f, 0.130f, 16.f) {
-        reset();
-    }
+    Robotino2Input();
 
     void reset();
 
