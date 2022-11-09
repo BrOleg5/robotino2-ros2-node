@@ -1,5 +1,9 @@
 #include "robotino2/Robotino2Input.hpp"
 
+Robotino2Input::Robotino2Input() : robotinoKinematics(0.04f, 0.130f, 16.f) {
+    reset();
+}
+
 void Robotino2Input::reset() {
     // Set default PID controllers parameters
     kp.fill(255);

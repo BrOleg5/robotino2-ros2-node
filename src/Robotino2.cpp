@@ -1,5 +1,14 @@
 #include "robotino2/Robotino2.hpp"
 
+Robotino2::Robotino2(): input(), output(), socket(ios) {
+    transmitTCPPointer = reinterpret_cast<unsigned char*>(&transmitTCPPayload);
+    startMessage = buffer + startPayload;
+}
+
+Robotino2::~Robotino2() {
+    socket.close();
+}
+
 bool Robotino2::connect(const std::string& address, int port) {
     endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(address), port);
     socket.connect(endpoint);
