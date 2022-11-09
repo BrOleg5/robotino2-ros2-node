@@ -16,11 +16,29 @@ void Robotino2Input::reset() {
     vx = 0.0f;
     vy = 0.0f;
     omega = 0.0f;
+    maxVelocitySetPoint.fill(200.f);
 }
 
 bool Robotino2Input::setMotorVelocity(unsigned char motorNum, float velocity) {
     if(motorNum < 3) {
-        velocitySetPointRPM[motorNum] = rads2rpm(velocity);
+        if(std::abs(velocity) <= std::abs(maxVelocitySetPoint[motorNum])) {
+            velocitySetPointRPM[motorNum] = rads2rpm(velocity);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+}
+
+bool Robotino2Input::setMotorVelocities(const std::array<float, 3>& velocity) {
+    if((std::abs(velocity[0]) <= std::abs(maxVelocitySetPoint[0])) &&
+       (std::abs(velocity[1]) <= std::abs(maxVelocitySetPoint[1])) &&
+       (std::abs(velocity[2]) <= std::abs(maxVelocitySetPoint[2]))) {
+        velocitySetPointRPM = rads2rpm(velocity);
         return true;
     }
     else {
@@ -28,14 +46,18 @@ bool Robotino2Input::setMotorVelocity(unsigned char motorNum, float velocity) {
     }
 }
 
-void Robotino2Input::setMotorVelocities(const std::array<float, 3>& velocity) {
-    velocitySetPointRPM = rads2rpm(velocity);
-}
-
-void Robotino2Input::setMotorVelocities(float omega1, float omega2, float omega3) {
-    velocitySetPointRPM[0] = rads2rpm(omega1);
-    velocitySetPointRPM[1] = rads2rpm(omega2);
-    velocitySetPointRPM[2] = rads2rpm(omega3);
+bool Robotino2Input::setMotorVelocities(float omega1, float omega2, float omega3) {
+    if((std::abs(omega1) <= std::abs(maxVelocitySetPoint[0])) &&
+       (std::abs(omega2) <= std::abs(maxVelocitySetPoint[1])) &&
+       (std::abs(omega3) <= std::abs(maxVelocitySetPoint[2]))) {
+        velocitySetPointRPM[0] = rads2rpm(omega1);
+        velocitySetPointRPM[1] = rads2rpm(omega2);
+        velocitySetPointRPM[2] = rads2rpm(omega3);
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 bool Robotino2Input::resetMotorPosition(unsigned char motorNum) {
@@ -169,8 +191,12 @@ void Robotino2Input::resetShutdown() {
     shutdown = false;
 }
 
-void Robotino2Input::setRobotSpeed(float vx, float vy, float omega) {
-    setMotorVelocities(robotinoKinematics.inverse(vx, vy, omega));
+bool Robotino2Input::setRobotSpeed(float vx, float vy, float omega) {
+    return setMotorVelocities(robotinoKinematics.inverse(vx, vy, omega));
+}
+
+void Robotino2Input::setMaxMotorVelocity(const std::array<float, 3>& max_vel) {
+    maxVelocitySetPoint = max_vel;
 }
 
 void Robotino2Input::toTCPPayload(TransmitTCPPayload& buffer) const {

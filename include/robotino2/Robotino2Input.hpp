@@ -17,8 +17,8 @@ public:
     void reset();
 
     bool setMotorVelocity(unsigned char motorNum, float velocity);
-    void setMotorVelocities(const std::array<float, 3>& velocity);
-    void setMotorVelocities(float omega1, float omega2, float omega3);
+    bool setMotorVelocities(const std::array<float, 3>& velocity);
+    bool setMotorVelocities(float omega1, float omega2, float omega3);
     bool resetMotorPosition(unsigned char motorNum);
     void resetMotorPositions();
     bool setMotorPosition(unsigned char motorNum);
@@ -41,7 +41,8 @@ public:
     void setEncoderInputPosition(); // ?
     void setShutdown();
     void resetShutdown();
-    void setRobotSpeed(float vx, float vy, float omega);
+    bool setRobotSpeed(float vx, float vy, float omega);
+    void setMaxMotorVelocity(const std::array<float, 3>& max_vel);
 
     void toTCPPayload(TransmitTCPPayload& buffer) const;
 
@@ -72,6 +73,8 @@ private:
     float omega;
 
     RobotinoKinematics robotinoKinematics;
+
+    std::array<float, 3> maxVelocitySetPoint;
 };
 
 #endif

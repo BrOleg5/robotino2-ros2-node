@@ -24,7 +24,7 @@ class Robotino2Node : public rclcpp::Node {
         Robotino2Node() : Node("robotino2"), input_message_timeout(200) {
             this->declare_parameter("ip", "172.26.1.0");
             this->declare_parameter("port", 80);
-            this->declare_parameter("sample_time", 20);
+            this->declare_parameter("sample_period", 20);
 
             std::string address = this->get_parameter("ip").get_parameter_value().get<std::string>();
             int port = static_cast<int>(this->get_parameter("port").get_parameter_value().get<long long>());
@@ -47,8 +47,8 @@ class Robotino2Node : public rclcpp::Node {
                                              std::bind(&Robotino2Node::reset_motor_positions_callback, this, 
                                              std::placeholders::_1, std::placeholders::_2));
 
-            milliseconds sample_time = milliseconds(this->get_parameter("sample_time").get_parameter_value().get<long long>());
-            timer_ = this->create_wall_timer(sample_time, std::bind(&Robotino2Node::timer_callback, this));
+            milliseconds sample_period = milliseconds(this->get_parameter("sample_period").get_parameter_value().get<long long>());
+            timer_ = this->create_wall_timer(sample_period, std::bind(&Robotino2Node::timer_callback, this));
         }
 
     private:

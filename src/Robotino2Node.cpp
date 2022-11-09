@@ -1,14 +1,18 @@
 #include "robotino2/Robotino2Node.hpp"
 
 void Robotino2Node::cmd_vel_callback(const geometry_msgs::msg::Twist& msg) {
-    robotino.input.setRobotSpeed(static_cast<float>(msg.linear.x), static_cast<float>(msg.linear.y), static_cast<float>(msg.angular.z));
     // RCLCPP_INFO(this->get_logger(), "Receive set speed: %f, %f, %f", msg.linear.x, msg.linear.y, msg.angular.z);
+    if(!robotino.input.setRobotSpeed(static_cast<float>(msg.linear.x), static_cast<float>(msg.linear.y), static_cast<float>(msg.angular.z))) {
+        RCLCPP_WARN(this->get_logger(), "Set speed is very high!");
+    }
     last_input_message_time = steady_clock::now();
 }
 
 void Robotino2Node::mot_vel_callback(const robotino_interfaces::msg::MotorVelocities& msg) {
-    robotino.input.setMotorVelocities(msg.vel[0], msg.vel[1], msg.vel[2]);
     // RCLCPP_INFO(this->get_logger(), "Receive set motor velocities: %f, %f, %f", msg.vel[0], msg.vel[1], msg.vel[2]);
+    if(!robotino.input.setMotorVelocities(msg.vel[0], msg.vel[1], msg.vel[2])) {
+        RCLCPP_WARN(this->get_logger(), "Set velocity is very high!");
+    }
     last_input_message_time = steady_clock::now();
 }
 
