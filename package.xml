@@ -5,7 +5,8 @@
   <version>0.0.1</version>
   <description>ROS2 node of Festo Robotino2</description>
   <maintainer email="oleg.brylyov@mail.ru">BrOleg5</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache License 2.0</license>
+  <author>BrOleg5</author>
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
