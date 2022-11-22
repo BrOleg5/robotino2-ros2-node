@@ -8,9 +8,9 @@ This package doesn't use OpenRobotinoAPI because it is only for x86 application 
 
 Robotino communication protocol is defined with little "reverse engineering".
 Communication between OpenRobotnioAPI and Robotino was analyzed using Wireshark.
-Structure of TCP payload of input and output packages was defined with matching TCP payload content and public header of OpenRobotinoAPI. Searched information is in SensorState.h and SetState.h (/include/rec/iocontrol/remotestate) in `toQDSAProtocol` and `fromQDSAProtocol` methods.
+Structure of TCP payload of input and output packages was defined with matching TCP payload content and public header of OpenRobotinoAPI. Searched information is in SensorState.h and SetState.h (`/include/rec/iocontrol/remotestate`) in `toQDSAProtocol` and `fromQDSAProtocol` methods.
 
-TCP payload of start package (it begins communication with Robotino 2) was hardcoded in following bytes: 0x02, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00.
+TCP payload of start package (it begins communication with Robotino 2) was hardcoded in following bytes: `0x02, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00`.
 
 Simple TCP client was implemented using Boost library.
 
