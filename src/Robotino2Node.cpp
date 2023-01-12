@@ -9,23 +9,26 @@ Robotino2Node::Robotino2Node() : Node("robotino2"), input_message_timeout(200) {
     RCLCPP_INFO(this->get_logger(), "Connect to Robotino2 %s:%d", address.c_str(), port);
 
     std::string node_name = this->get_name();
-    cmd_vel_subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(node_name + "/cmd_vel", 10, 
+    cmd_vel_subscription = this->create_subscription<geometry_msgs::msg::Twist>("/" + node_name + "/cmd_vel", 10, 
                             std::bind(&Robotino2Node::cmd_vel_callback, this, std::placeholders::_1));
-    mot_vel_subscription_ = this->create_subscription<robotino_interfaces::msg::MotorVelocities>(node_name + "/cmd_mot_vel", 10,
+    mot_vel_subscription = this->create_subscription<robotino_interfaces::msg::MotorState>("/" + node_name + "/cmd_mot_vel", 10,
                             std::bind(&Robotino2Node::mot_vel_callback, this, std::placeholders::_1));
 
-    bumper_publisher_ = this->create_publisher<std_msgs::msg::Bool>(node_name + "/bumper", 10);
-    motor_positions_publisher_ = this->create_publisher<robotino_interfaces::msg::MotorPositions>(node_name + "/mot_pos", 10);
-    motor_velocities_publisher_ = this->create_publisher<robotino_interfaces::msg::MotorVelocities>(node_name + "/mot_vel", 10);
-    motor_currents_publisher_ = this->create_publisher<robotino_interfaces::msg::MotorCurrents>(node_name + "/mot_cur", 10);
-    distance_sensor_publisher_ = this->create_publisher<robotino_interfaces::msg::DistanceSensorVoltages>(node_name + "/dist_sens", 10);
+    bumper_publisher = this->create_publisher<std_msgs::msg::Bool>("/" + node_name + "/bumper", 10);
+    std::string topic_name = "/" + node_name + "/motor_state";
+    motor_state_publisher = this->create_publisher<robotino_interfaces::msg::MotorState>(topic_name, 10);
+    
+    topic_name = "/" + node_name + "/ir";
+    distance_sensor_publisher = this->create_publisher<robotino_interfaces::msg::Range>(topic_name, 10);
 
-    reset_motor_positions_service_ = this->create_service<std_srvs::srv::Empty>(node_name + "/reset_pos", 
+    init_msgs();
+
+    reset_motor_positions_service = this->create_service<std_srvs::srv::Empty>("/" + node_name + "/reset_pos", 
                                         std::bind(&Robotino2Node::reset_motor_positions_callback, this, 
                                         std::placeholders::_1, std::placeholders::_2));
 
     milliseconds sample_period = milliseconds(this->get_parameter("sample_period").get_parameter_value().get<long long>());
-    timer_ = this->create_wall_timer(sample_period, std::bind(&Robotino2Node::timer_callback, this));
+    timer = this->create_wall_timer(sample_period, std::bind(&Robotino2Node::timer_callback, this));
 }
 
 void Robotino2Node::declare_node_parameters() {
@@ -40,6 +43,17 @@ void Robotino2Node::declare_node_parameters() {
     this->declare_parameter("sample_period", 20, sample_period_param_desc);
 }
 
+void Robotino2Node::init_msgs() {
+    for (unsigned char i = 0; i < 3; i++) {
+        motor_state_msg.name[i] = "motor_" + std::to_string(i+1);
+    }
+
+    range_msg.radiation_type = range_msg.INFRARED;
+    range_msg.field_of_view = 0.7f; // Will correct in the future
+    range_msg.min_range = 0.04f;
+    range_msg.max_range = 0.30f;
+}
+
 void Robotino2Node::cmd_vel_callback(const geometry_msgs::msg::Twist& msg) {
     // RCLCPP_INFO(this->get_logger(), "Receive set speed: %f, %f, %f", msg.linear.x, msg.linear.y, msg.angular.z);
     if(!robotino.input.setRobotSpeed(static_cast<float>(msg.linear.x), static_cast<float>(msg.linear.y), static_cast<float>(msg.angular.z))) {
@@ -48,34 +62,29 @@ void Robotino2Node::cmd_vel_callback(const geometry_msgs::msg::Twist& msg) {
     last_input_message_time = steady_clock::now();
 }
 
-void Robotino2Node::mot_vel_callback(const robotino_interfaces::msg::MotorVelocities& msg) {
+void Robotino2Node::mot_vel_callback(const robotino_interfaces::msg::MotorState& msg) {
     // RCLCPP_INFO(this->get_logger(), "Receive set motor velocities: %f, %f, %f", msg.vel[0], msg.vel[1], msg.vel[2]);
-    if(!robotino.input.setMotorVelocities(msg.vel[0], msg.vel[1], msg.vel[2])) {
+    if(!robotino.input.setMotorVelocities(msg.velocity)) {
         RCLCPP_WARN(this->get_logger(), "Set velocity is very high!");
     }
     last_input_message_time = steady_clock::now();
 }
 
 void Robotino2Node::publish_all() {
+    builtin_interfaces::msg::Time stamp = this->get_clock()->now();
     std_msgs::msg::Bool bumper_msg;
     bumper_msg.data = robotino.output.getBumperState();
-    bumper_publisher_->publish(bumper_msg);
+    bumper_publisher->publish(bumper_msg);
 
-    robotino_interfaces::msg::MotorPositions mot_pos_msg;
-    mot_pos_msg.pos = robotino.output.getMotorPositions();
-    motor_positions_publisher_->publish(mot_pos_msg);
+    motor_state_msg.header.stamp = stamp;
+    motor_state_msg.position = robotino.output.getMotorPositions();
+    motor_state_msg.velocity = robotino.output.getMotorVelocities();
+    motor_state_msg.current = robotino.output.getMotorCurrents();
+    motor_state_publisher->publish(motor_state_msg);
 
-    robotino_interfaces::msg::MotorVelocities mot_vel_msg;
-    mot_vel_msg.vel = robotino.output.getMotorVelocities();
-    motor_velocities_publisher_->publish(mot_vel_msg);
-
-    robotino_interfaces::msg::MotorCurrents mot_cur_msg;
-    mot_cur_msg.cur = robotino.output.getMotorCurrents();
-    motor_currents_publisher_->publish(mot_cur_msg);
-
-    robotino_interfaces::msg::DistanceSensorVoltages dist_sens_msg;
-    dist_sens_msg.vol = robotino.output.getDistanceSensorVoltages();
-    distance_sensor_publisher_->publish(dist_sens_msg);
+    range_msg.header.stamp = stamp;
+    range_msg.range = robotino.output.getDistanceSensorVoltages();
+    distance_sensor_publisher->publish(range_msg);
 }
 
 void Robotino2Node::timer_callback() {
