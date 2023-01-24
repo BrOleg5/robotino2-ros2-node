@@ -9,7 +9,7 @@ void Robotino2Input::reset() {
     kp.fill(255);
     ki.fill(255);
     kd.fill(255);
-    velocitySetPointRPM.fill(0.f);
+    velocitySetPoint.fill(0.f);
     resetPosition.fill(false);
     digitalOutput.fill(false);
     relay.fill(false);
@@ -26,7 +26,7 @@ void Robotino2Input::reset() {
 bool Robotino2Input::setMotorVelocity(unsigned char motorNum, float velocity) {
     if(motorNum < 3) {
         if(std::abs(velocity) <= std::abs(maxVelocitySetPoint[motorNum])) {
-            velocitySetPointRPM[motorNum] = rads2rpm(velocity);
+            velocitySetPoint[motorNum] = velocity;
             return true;
         }
         else {
@@ -42,7 +42,7 @@ bool Robotino2Input::setMotorVelocities(const std::array<float, 3>& velocity) {
     if((std::abs(velocity[0]) <= std::abs(maxVelocitySetPoint[0])) &&
        (std::abs(velocity[1]) <= std::abs(maxVelocitySetPoint[1])) &&
        (std::abs(velocity[2]) <= std::abs(maxVelocitySetPoint[2]))) {
-        velocitySetPointRPM = rads2rpm(velocity);
+        velocitySetPoint = velocity;
         return true;
     }
     else {
@@ -54,9 +54,9 @@ bool Robotino2Input::setMotorVelocities(float omega1, float omega2, float omega3
     if((std::abs(omega1) <= std::abs(maxVelocitySetPoint[0])) &&
        (std::abs(omega2) <= std::abs(maxVelocitySetPoint[1])) &&
        (std::abs(omega3) <= std::abs(maxVelocitySetPoint[2]))) {
-        velocitySetPointRPM[0] = rads2rpm(omega1);
-        velocitySetPointRPM[1] = rads2rpm(omega2);
-        velocitySetPointRPM[2] = rads2rpm(omega3);
+        velocitySetPoint[0] = omega1;
+        velocitySetPoint[1] = omega2;
+        velocitySetPoint[2] = omega3;
         return true;
     }
     else {
@@ -204,10 +204,10 @@ void Robotino2Input::setMaxMotorVelocity(const std::array<float, 3>& max_vel) {
 }
 
 void Robotino2Input::toTCPPayload(TransmitTCPPayload& buffer) const {
-    //velocitySetPointRPM is in rpm, speed in inc/900ms
+    //velocitySetPoint is in rpm, speed in inc/900ms
     float speed[3];
     for(unsigned char i = 0; i < 3; i++) {
-        speed[i] = velocitySetPointRPM[i] * 2000.0f / 900.0f / 60.0f;
+        speed[i] = velocitySetPoint[i] * 2000.0f / 900.0f / 60.0f;
         if(speed[i] > 255.0f) {
             speed[i] = 255.0f;
         }

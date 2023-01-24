@@ -16,7 +16,7 @@ std::array<float, 3> RobotinoKinematics::direct(const std::array<float, 3>& whee
     robotSpeed[1] = 2.f * wheelRadius / 3.f * (cos(wheelAngle[0]) * wheelVelocity[0] +
                                                 cos(wheelAngle[1]) * wheelVelocity[1] + 
                                                 cos(wheelAngle[2]) * wheelVelocity[2]);
-    robotSpeed[1] = 2.f * wheelRadius / 3.f / robotRadius * (wheelVelocity[0] + wheelVelocity[1] + wheelVelocity[2]);
+    robotSpeed[2] = wheelRadius * (wheelVelocity[0] + wheelVelocity[1] + wheelVelocity[2]) / 3.f / robotRadius;
     return robotSpeed;
 }
 
@@ -28,6 +28,6 @@ std::array<float, 3> RobotinoKinematics::direct(float omega1, float omega2, floa
     robotSpeed[1] = 2.f * wheelRadius / 3.f * (cos(wheelAngle[0]) * omega1 +
                                                 cos(wheelAngle[1]) * omega2 + 
                                                 cos(wheelAngle[2]) * omega3);
-    robotSpeed[1] = 2.f * wheelRadius / 3.f / robotRadius * (omega1 + omega2 + omega3);
+    robotSpeed[2] = wheelRadius * (omega1 + omega2 + omega3) / 3.f / robotRadius;
     return robotSpeed;
 }

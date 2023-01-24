@@ -80,6 +80,7 @@ void Robotino2Node::publish_all() {
     motor_state_msg.position = robotino.output.getMotorPositions();
     motor_state_msg.velocity = robotino.output.getMotorVelocities();
     motor_state_msg.current = robotino.output.getMotorCurrents();
+    motor_state_msg.velocity_set_point = robotino.input.getMotorVelocity();
     motor_state_publisher->publish(motor_state_msg);
 
     range_msg.header.stamp = stamp;

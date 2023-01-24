@@ -32,16 +32,16 @@ string(CONCAT ROBOTINO2_PUBLIC_HEADER "${INCLUDE_DIR}/Robotino2.hpp;"
                                       "${INCLUDE_DIR}/RobotinoKinematics.hpp;"
                                       "${INCLUDE_DIR}/utils.hpp")
 
-add_library(robotino2 src/Robotino2.cpp src/Robotino2Input.cpp src/Robotino2Output.cpp src/RobotinoKinematics.cpp)
+add_library(robotino2_lib src/Robotino2.cpp src/Robotino2Input.cpp src/Robotino2Output.cpp src/RobotinoKinematics.cpp)
 
-set_target_properties(robotino2 PROPERTIES
+set_target_properties(robotino2_lib PROPERTIES
                       VERSION ${PROJECT_VERSION}
                       PUBLIC_HEADER "${ROBOTINO2_PUBLIC_HEADER}"
                       DEBUG_POSTFIX d)
 
-target_link_libraries(robotino2 ${Boost_LIBRARIES})
+target_link_libraries(robotino2_lib ${Boost_LIBRARIES})
 
-target_include_directories(robotino2 PUBLIC
+target_include_directories(robotino2_lib PUBLIC
                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                           ${Boost_INCLUDE_DIRS})
@@ -55,7 +55,7 @@ set_target_properties(robotino2_node PROPERTIES
                       PUBLIC_HEADER "${INCLUDE_DIR}/Robotino2Node.hpp"
                       DEBUG_POSTFIX d)
 
-target_link_libraries(robotino2_node robotino2)
+target_link_libraries(robotino2_node robotino2_lib)
 
 target_include_directories(robotino2_node PUBLIC
                            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -85,7 +85,7 @@ if(BUILD_TESTING)
 endif()
 
 install(TARGETS
-        robotino2
+        robotino2_lib
         robotino2_node
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
@@ -100,5 +100,8 @@ install(DIRECTORY
         launch
         DESTINATION share/${PROJECT_NAME}/
 )
+
+ament_export_include_directories("include")
+ament_export_libraries(robotino2_lib)
 
 ament_package()

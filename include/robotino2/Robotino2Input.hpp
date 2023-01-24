@@ -44,8 +44,10 @@ public:
 
     void toTCPPayload(TransmitTCPPayload& buffer) const;
 
+    inline std::array<float, 3> getMotorVelocity();
+
 private:
-    std::array<float, 3> velocitySetPointRPM;
+    std::array<float, 3> velocitySetPoint;
 
     std::array<bool, 3> resetPosition;
 
@@ -74,5 +76,9 @@ private:
 
     std::array<float, 3> maxVelocitySetPoint;
 };
+
+inline std::array<float, 3> Robotino2Input::getMotorVelocity() {
+    return velocitySetPoint;
+}
 
 #endif
