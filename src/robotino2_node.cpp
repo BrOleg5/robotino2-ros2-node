@@ -1,3 +1,5 @@
+// Copyright 2022 BrOleg5
+
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"

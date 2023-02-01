@@ -1,9 +1,12 @@
-#ifndef TCPPAYLOAD_HPP
-#   define TCPPAYLOAD_HPP
+// Copyright 2022 BrOleg5
+
+#ifndef ROBOTINO2__TCPPAYLOAD_HPP_
+#define ROBOTINO2__TCPPAYLOAD_HPP_
 
 #pragma pack(push, 1)
 struct TransmitTCPPayload {
-    unsigned char prefix[12] = {0x00, 0x4c, 0x00, 0x00, 0x00, 0x90, 0x1f, 0x00, 0x00, 0x00, 0x00, 0x00};
+    unsigned char prefix[12] = {0x00, 0x4c, 0x00, 0x00, 0x00, 0x90,
+                                0x1f, 0x00, 0x00, 0x00, 0x00, 0x00};
     unsigned char startBytes[3] = {'R', 'E', 'C'};
     unsigned char shutdown;
     unsigned char digitalOut1_4Relay1;
@@ -36,4 +39,4 @@ struct TransmitTCPPayload {
 };
 #pragma pack(pop)
 
-#endif
+#endif  // ROBOTINO2__TCPPAYLOAD_HPP_

@@ -1,5 +1,7 @@
-#ifndef UTILS_HPP
-#   define UTILS_HPP
+// Copyright 2022 BrOleg5
+
+#ifndef ROBOTINO2__UTILS_HPP_
+#define ROBOTINO2__UTILS_HPP_
 
 #ifndef PI
 #   define PI 3.14159265359f
@@ -35,4 +37,4 @@ inline std::array<T, N> rads2rpm(std::array<T, N> rads) {
     return rpm;
 }
 
-#endif
+#endif  // ROBOTINO2__UTILS_HPP_

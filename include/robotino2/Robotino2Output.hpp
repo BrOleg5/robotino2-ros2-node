@@ -1,5 +1,7 @@
-#ifndef ROBOTINO2OUTPUT_HPP
-#   define ROBOTINO2OUTPUT_HPP
+// Copyright 2022 BrOleg5
+
+#ifndef ROBOTINO2__ROBOTINO2OUTPUT_HPP_
+#define ROBOTINO2__ROBOTINO2OUTPUT_HPP_
 
 #include <iostream>
 #include <array>
@@ -14,7 +16,7 @@ public:
 
     bool fromTCPPayload(const unsigned char* data);
 
-    inline int getMotorPosition(unsigned char motorNum);
+    inline float getMotorPosition(unsigned char motorNum);
     inline float getMotorVelocity(unsigned char motorNum);
     inline float getMotorCurrent(unsigned char motorNum);
     inline bool getDigitalInput(unsigned char inputNum);
@@ -25,7 +27,7 @@ public:
     inline float getPowerSupplyVoltage();
     inline unsigned int getFirmwareVersion();
     inline unsigned int getSequenceNumber();
-    std::array<int, 3> getMotorPositions();
+    std::array<float, 3> getMotorPositions();
     std::array<float, 3> getMotorVelocities();
     std::array<float, 3> getMotorCurrents();
     std::array<bool, 8> getDigitalInputs();
@@ -34,20 +36,20 @@ public:
 
 private:
     float powerOutputCurrent;
-    unsigned short powerOutputRawCurrent;
+    uint16_t powerOutputRawCurrent;
 
     int encoderInputPosition;
     int encoderInputVelocity;
 
     std::array<float, 3> motorVelocity;
-    std::array<int, 3> motorPosition;
+    std::array<float, 3> motorPosition;
     std::array<float, 3> motorCurrent;
-    std::array<unsigned short, 3> rawMotorCurrent;
+    std::array<uint16_t, 3> rawMotorCurrent;
 
-    //digital inputs
+    // digital inputs
     std::array<bool, 8> dIn;
 
-    //analog inputs
+    // analog inputs
     std::array<float, 8> aIn;
 
     std::array<float, 9> distanceSensor;
@@ -61,12 +63,12 @@ private:
 
     unsigned int sequenceNumber;
 
-    //EA09 firmware version
-    //If this is {0,0,0} we have a EA05
+    // EA09 firmware version
+    // If this is {0,0,0} we have a EA05
     std::array<unsigned char, 3> firmware_version;
 };
 
-inline int Robotino2Output::getMotorPosition(unsigned char motorNum) {
+inline float Robotino2Output::getMotorPosition(unsigned char motorNum) {
     return motorPosition[motorNum];
 }
 
@@ -110,4 +112,4 @@ inline unsigned int Robotino2Output::getSequenceNumber() {
     return sequenceNumber;
 }
 
-#endif
+#endif  // ROBOTINO2__ROBOTINO2OUTPUT_HPP_

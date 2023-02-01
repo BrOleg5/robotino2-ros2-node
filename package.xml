@@ -8,15 +8,16 @@
   <license>Apache License 2.0</license>
   <author>BrOleg5</author>
 
+<buildtool_depend>ament_cmake</buildtool_depend>
+
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>std_srvs</depend>
   <depend>geometry_msgs</depend>
-  <depend>robotino_interfaces</depend>
+  <depend>extra_robot_interfaces</depend>
+  
   <depend>boost</depend>
-
-  <buildtool_depend>ament_cmake</buildtool_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

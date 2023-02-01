@@ -1,5 +1,7 @@
-#ifndef ROBOTINO2INPUT_HPP
-#   define ROBOTINO2INPUT_HPP
+// Copyright 2022 BrOleg5
+
+#ifndef ROBOTINO2__ROBOTINO2INPUT_HPP_
+#define ROBOTINO2__ROBOTINO2INPUT_HPP_
 
 #include <cmath>
 #include <array>
@@ -22,7 +24,8 @@ public:
     bool setMotorPosition(unsigned char motorNum);
     void setMotorPositions();
     bool setMotorPID(unsigned char motorNum, unsigned char kp, unsigned char ki, unsigned char kd);
-    void setMotorPIDs(const std::array<unsigned char, 3>& kp, const std::array<unsigned char, 3>& ki, 
+    void setMotorPIDs(const std::array<unsigned char, 3>& kp,
+                      const std::array<unsigned char, 3>& ki,
                       const std::array<unsigned char, 3>& kd);
     bool setDigitalOutput(unsigned char outputNum);
     bool resetDigitalOutput(unsigned char outputNum);
@@ -34,9 +37,9 @@ public:
     void setRelies(const std::array<bool, 2>& relayState);
     void setRelies();
     void resetRelies();
-    void setPowerOutputControlPoint(short powerOutput);
-    void resetEncoderInputPosition(); // ?
-    void setEncoderInputPosition(); // ?
+    void setPowerOutputControlPoint(int16_t powerOutput);
+    void resetEncoderInputPosition();
+    void setEncoderInputPosition();
     void setShutdown();
     void resetShutdown();
     bool setRobotSpeed(float vx, float vy, float omega);
@@ -45,6 +48,7 @@ public:
     void toTCPPayload(TransmitTCPPayload& buffer) const;
 
     inline std::array<float, 3> getMotorVelocity();
+    inline float getMotorVelocity(unsigned char motorNum);
 
 private:
     std::array<float, 3> velocitySetPoint;
@@ -61,7 +65,7 @@ private:
     std::array<bool, 2> relay;
 
     /**Range [-255;255] */
-    short powerOutputControlPoint;
+    int16_t powerOutputControlPoint;
 
     bool encoderInputResetPosition;
 
@@ -81,4 +85,8 @@ inline std::array<float, 3> Robotino2Input::getMotorVelocity() {
     return velocitySetPoint;
 }
 
-#endif
+inline float Robotino2Input::getMotorVelocity(unsigned char motorNum) {
+    return velocitySetPoint[motorNum];
+}
+
+#endif  // ROBOTINO2__ROBOTINO2INPUT_HPP_

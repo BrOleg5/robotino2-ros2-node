@@ -1,11 +1,13 @@
+// Copyright 2022 BrOleg5
+
 #include "robotino2/Robotino2Output.hpp"
 
 Robotino2Output::Robotino2Output() {
-    reset();   
+    reset();
 }
 
 void Robotino2Output::reset() {
-    motorPosition.fill(0);
+    motorPosition.fill(0.f);
     motorVelocity.fill(0.f);
     motorCurrent.fill(0.f);
     rawMotorCurrent.fill(0);
@@ -25,11 +27,12 @@ void Robotino2Output::reset() {
 }
 
 bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
-    unsigned short distance[9] = {0};
-    unsigned short ad[8] = {0};
-    short avint[3] = {0};
-    unsigned short currentint;
-    unsigned short voltageint;
+    int motorPositionTicks[3] = {0};
+    uint16_t distance[9] = {0};
+    uint16_t ad[8] = {0};
+    int16_t avint[3] = {0};
+    uint16_t currentint;
+    uint16_t voltageint;
     unsigned char* uint8p;
 
     if( *(data)     != 'R' ||
@@ -37,12 +40,12 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
         *(data+2)   != 'C' ||
         *(data+98)  != 'r' ||
         *(data+99)  != 'e' ||
-        *(data+100) != 'c' ) 
+        *(data+100) != 'c' )
     {
         return false;
     }
 
-    //master start at byte 3
+    // master start at byte 3
     currentint = (*(data+3) << 2);
     voltageint = (*(data+5) << 2);
 
@@ -53,7 +56,7 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
     currentint |= (*(data+11) & 0x3);
     voltageint |= (( *(data+11) >> 4 ) & 0x3);
 
-    //slave 0 start at byte 14
+    // slave 0 start at byte 14
     rawMotorCurrent[0] = (*(data+14) << 2);
     distance[5] = (*(data+15) << 2);
     distance[6] = (*(data+16) << 2);
@@ -84,14 +87,14 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
         avint[0] = -avint[0];
     }
 
-    uint8p = reinterpret_cast<unsigned char*>(&motorPosition[0]);
+    uint8p = reinterpret_cast<unsigned char*>(&motorPositionTicks[0]);
     *uint8p++ = *(data+26);
     *uint8p++ = *(data+27);
     *uint8p++ = *(data+28);
     *uint8p = *(data+29);
-    motorPosition[0] = -motorPosition[0];
+    motorPositionTicks[0] = -motorPositionTicks[0];
 
-    //digital input
+    // digital input
     dIn[0] = ((*(data+30) & 1 ) > 0);
     dIn[1] = ((*(data+30) & 1<<1 ) > 0);
     dIn[2] = ((*(data+30) & 1<<2 ) > 0);
@@ -100,7 +103,7 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
 
     sequenceNumber = *reinterpret_cast<const unsigned int*>(data+31);
 
-    //slave 1 start at byte 35
+    // slave 1 start at byte 35
     rawMotorCurrent[1] = (*(data+35) << 2);
     distance[4] = (*(data+36) << 2);
     distance[3] = (*(data+37) << 2);
@@ -125,23 +128,23 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
         avint[1] = -avint[1];
     }
 
-    uint8p = reinterpret_cast<unsigned char*>(&motorPosition[1]);
+    uint8p = reinterpret_cast<unsigned char*>(&motorPositionTicks[1]);
     *uint8p++ = *(data+47);
     *uint8p++ = *(data+48);
     *uint8p++ = *(data+49);
     *uint8p = *(data+50);
-    motorPosition[1] = -motorPosition[1];
+    motorPositionTicks[1] = -motorPositionTicks[1];
 
     dIn[4] = ((*(data+51) & 1 ) > 0);
     dIn[5] = ((*(data+51) & 1<<1 ) > 0);
     dIn[6] = ((*(data+51) & 1<<2 ) > 0);
     dIn[7] = ((*(data+51) & 1<<3 ) > 0);
 
-    //slave 2 start at byte 56
+    // slave 2 start at byte 56
     rawMotorCurrent[2] = (*(data+56) << 2);
     distance[1] = (*(data+57) << 2);
 
-    //AD2
+    // AD2
     distance[0] = (*(data+58) << 2);
 
     distance[8] = (*(data+63) << 2);
@@ -158,14 +161,14 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
         avint[2] = -avint[2];
     }
 
-    uint8p = reinterpret_cast<unsigned char*>(&motorPosition[2]);
+    uint8p = reinterpret_cast<unsigned char*>(&motorPositionTicks[2]);
     *uint8p++ = *(data+68);
     *uint8p++ = *(data+69);
     *uint8p++ = *(data+70);
     *uint8p = *(data+71);
-    motorPosition[2] = -motorPosition[2];
+    motorPositionTicks[2] = -motorPositionTicks[2];
 
-    //slave 3 start at byte 77
+    // slave 3 start at byte 77
     powerOutputRawCurrent = (*(data+77) << 2);
     powerOutputRawCurrent |= (*(data+85) & 0x3);
 
@@ -193,7 +196,8 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
     }
 
     for(unsigned int i = 0; i < 3; i++) {
-        motorVelocity[i] = 27.0f * avint[i]; // 900 * 60 / 2000 = 27
+        motorPosition[i] = 2.0f * PI / (500.f * 4.f) * static_cast<float>(motorPositionTicks[i]);
+        motorVelocity[i] = 900.f * 60.f / (500.f * 4.f) * static_cast<float>(avint[i]);
         motorCurrent[i] = static_cast<float>( rawMotorCurrent[i] ) / 156.0f;
     }
 
@@ -203,8 +207,8 @@ bool Robotino2Output::fromTCPPayload(const unsigned char* data) {
     return true;
 }
 
-std::array<int, 3> Robotino2Output::getMotorPositions() {
-    std::array<int, 3> actualPosition;
+std::array<float, 3> Robotino2Output::getMotorPositions() {
+    std::array<float, 3> actualPosition;
     for (unsigned char i = 0; i < 3; i++) {
         actualPosition[i] = motorPosition[i];
     }
