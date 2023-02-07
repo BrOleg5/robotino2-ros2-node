@@ -16,7 +16,8 @@ def generate_launch_description():
             output='screen',
             emulate_tty=True,
             parameters=[{
-                'ip': LaunchConfiguration('ip')
+                'ip': LaunchConfiguration('ip'),
+                'sample_time': 40
             }]
         ),
         Node(
@@ -24,6 +25,9 @@ def generate_launch_description():
             executable='teleop_twist_keyboard',
             output='screen',
             emulate_tty=True,
+            parameters=[{
+                'angular_speed.step': 0.2
+            }],
             remappings=[
                 ("/cmd_vel", "/robotino2/cmd_vel")
             ]

@@ -117,6 +117,7 @@ void Robotino2Node::publish_all() {
     bumper_publisher->publish(bumper_msg);
 
     motor_state_msg.header.stamp = stamp;
+    joint_state_msg.header.stamp = stamp;
     for (unsigned char i = 0; i < 3; i++) {
         motor_state_msg.position[i] = robotino.output.getMotorPosition(i);
         motor_state_msg.velocity[i] = robotino.output.getMotorVelocity(i);

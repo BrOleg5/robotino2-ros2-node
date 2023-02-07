@@ -14,24 +14,29 @@ TCP payload of start package (it begins communication with Robotino 2) was hardc
 
 Simple TCP client was implemented using Boost library.
 
-## Topics and services of node
+## Node description
+
+Node parameters:
+
+- `ip` &ndash; IP-address of Robotino2. Default: 172.26.1.0
+- `port` &ndash; port of Robotino2. Default: 80
+- `sample_period` &ndash; sample period of node process (ms). Default: 20 ms
 
 Subscribed topics:
 
-- `robotino2/cmd_vel` &ndash; set robot speeds
-- `robotino2/cmd_mot_vel` &ndash; set robot motor velocities
+- `/robotino2/cmd_vel` &ndash; set robot speeds
+- `/robotino2/cmd_mot_vel` &ndash; set robot motor velocities
 
 Published topics:
 
-- `robotino2/bumper` &ndash; bumper state (false/true)
-- `robotino2/mot_pos` &ndash; motor positions according to encoders
-- `robotino2/mot_vel` &ndash; motor velocities (from motor positions)
-- `robotino2/mot_cur` &ndash; motor currents
-- `robotino2/dist_sens` &ndash; distance sensor voltages
+- `/robotino2/bumper` &ndash; bumper state (false/true)
+- `/robotino2/motor_state` &ndash; state of motors: name, position, velocity, current
+- `/robotino2/joint_state` &ndash; state of joints (wheels): name, position and velocity
+- `/robotino2/ir` &ndash; state of distance sensors: type, field of view, minimum and maximum ranges, current range
 
 Services:
 
-- `robotino2/reset_pos` &ndash; reset motor positions
+- `/robotino2/reset_pos` &ndash; reset motor positions
 
 ## Dependencies
 

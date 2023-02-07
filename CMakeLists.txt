@@ -31,7 +31,7 @@ find_package(Boost 1.71.0 REQUIRED)
 
 set(INCLUDE_DIR "include/${PROJECT_NAME}")
 
-string(CONCAT ROBOTINO2_PUBLIC_HEADER 
+string(CONCAT ROBOTINO2_PUBLIC_HEADER
   "${INCLUDE_DIR}/Robotino2.hpp;"
   "${INCLUDE_DIR}/Robotino2Input.hpp;"
   "${INCLUDE_DIR}/Robotino2Output.hpp;"
